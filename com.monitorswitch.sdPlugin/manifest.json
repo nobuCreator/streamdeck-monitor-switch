@@ -1,0 +1,29 @@
+{
+  "$schema": "https://schemas.elgato.com/streamdeck/plugins/manifest.json",
+  "Name": "Monitor Switch",
+  "Version": "1.0.0.0",
+  "Author": "Monitor Switch contributors",
+  "Description": "Switch between monitor layouts (which monitors are on, their positions and the main monitor) with one key: short press, double press or hold.",
+  "UUID": "com.monitorswitch",
+  "Icon": "imgs/plugin/icon",
+  "Category": "Monitor Switch",
+  "CategoryIcon": "imgs/plugin/category",
+  "CodePath": "bin/plugin.js",
+  "SDKVersion": 2,
+  "Software": { "MinimumVersion": "6.5" },
+  "OS": [{ "Platform": "windows", "MinimumVersion": "10" }],
+  "Nodejs": { "Version": "20" },
+  "Actions": [
+    {
+      "UUID": "com.monitorswitch.layout",
+      "Name": "Monitor Layout",
+      "Icon": "imgs/actions/icon",
+      "Tooltip": "Short press / double press / hold switch to the layouts captured in the settings",
+      "PropertyInspectorPath": "ui/index.html",
+      "Controllers": ["Keypad"],
+      "SupportedInMultiActions": false,
+      "UserTitleEnabled": false,
+      "States": [{ "Image": "imgs/actions/key", "TitleAlignment": "bottom", "FontSize": 14 }]
+    }
+  ]
+}

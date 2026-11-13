@@ -1,0 +1,5 @@
+node_modules/
+dist/
+com.monitorswitch.sdPlugin/bin/plugin.js
+com.monitorswitch.sdPlugin/logs/
+test-result.txt

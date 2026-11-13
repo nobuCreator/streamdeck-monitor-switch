@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Monitor Switch</title>
+<style>
+  body { font-family: "Segoe UI", sans-serif; font-size: 12px; color: #d8d8d8; background: transparent; margin: 0; padding: 4px 8px; }
+  h3 { font-size: 12px; margin: 10px 0 4px; color: #fff; }
+  .slot { border: 1px solid #3a3a3a; border-radius: 4px; padding: 6px 8px; margin-bottom: 8px; }
+  .slot .head { display: flex; justify-content: space-between; align-items: center; }
+  .slot .name { font-weight: 600; color: #fff; }
+  .slot .desc { color: #9a9a9a; margin: 4px 0; white-space: pre-line; }
+  button { background: #3d3d3d; color: #eee; border: 1px solid #555; border-radius: 3px; padding: 3px 8px; font-size: 11px; cursor: pointer; margin-left: 4px; }
+  button:hover { background: #4a4a4a; }
+  button.primary { background: #2f6fd6; border-color: #2f6fd6; }
+  .hint { color: #9a9a9a; line-height: 1.5; }
+  #current { color: #9a9a9a; white-space: pre-line; }
+</style>
+</head>
+<body>
+  <p class="hint" id="hint"></p>
+
+  <div class="slot" data-slot="short">
+    <div class="head"><span class="name" data-t="short"></span>
+      <span><button class="primary" data-act="capture" data-t="capture"></button><button data-act="test" data-t="test"></button><button data-act="clear" data-t="clear"></button></span></div>
+    <div class="desc"></div>
+  </div>
+  <div class="slot" data-slot="double">
+    <div class="head"><span class="name" data-t="double"></span>
+      <span><button class="primary" data-act="capture" data-t="capture"></button><button data-act="test" data-t="test"></button><button data-act="clear" data-t="clear"></button></span></div>
+    <div class="desc"></div>
+  </div>
+  <div class="slot" data-slot="hold">
+    <div class="head"><span class="name" data-t="hold"></span>
+      <span><button class="primary" data-act="capture" data-t="capture"></button><button data-act="test" data-t="test"></button><button data-act="clear" data-t="clear"></button></span></div>
+    <div class="desc"></div>
+  </div>
+
+  <h3 data-t="nowTitle"></h3>
+  <div id="current">…</div>
+
+<script>
+  const T = {
+    ja: {
+      hint: "Windowsの「設定 → ディスプレイ」でモニターを並べてから、使いたい押し方の「今の配置を登録」を押してください。メインにしたいモニターも先に設定しておきます。",
+      short: "短押し", double: "ダブルタップ", hold: "長押し",
+      capture: "今の配置を登録", test: "試す", clear: "消去",
+      none: "未登録", nowTitle: "今の配置", main: "メイン", off: "（それ以外はオフ）",
+    },
+    en: {
+      hint: "Arrange your monitors in Windows Settings > Display (including the main monitor), then press \"Capture\" for the press type you want.",
+      short: "Short press", double: "Double press", hold: "Hold",
+      capture: "Capture", test: "Test", clear: "Clear",
+      none: "Not set", nowTitle: "Current arrangement", main: "main", off: "(all others off)",
+    },
+  };
+  let L = T.en, ws, uuid, action, settings = {};
+
+  function describe(monitors) {
+    if (!monitors || !monitors.length) return L.none;
+    return monitors.map(m => `${m.name || m.id} (${m.id})  ${m.x},${m.y}` + (m.x === 0 && m.y === 0 ? `  ★${L.main}` : "")).join("\n");
+  }
+  function render() {
+    document.querySelectorAll("[data-t]").forEach(e => e.textContent = L[e.dataset.t]);
+    document.getElementById("hint").textContent = L.hint;
+    document.querySelectorAll(".slot").forEach(div => {
+      const l = settings[div.dataset.slot];
+      div.querySelector(".desc").textContent = l ? describe(l.monitors) + "\n" + L.off : L.none;
+    });
+  }
+  function send(payload) {
+    ws.send(JSON.stringify({ event: "sendToPlugin", action, context: uuid, payload }));
+  }
+
+  document.querySelectorAll("button[data-act]").forEach(b => b.addEventListener("click", () => {
+    send({ event: b.dataset.act, slot: b.closest(".slot").dataset.slot });
+  }));
+
+  // Called by the Stream Deck application.
+  function connectElgatoStreamDeckSocket(port, inUuid, registerEvent, info, actionInfo) {
+    uuid = inUuid;
+    const ai = JSON.parse(actionInfo);
+    action = ai.action;
+    settings = ai.payload.settings || {};
+    try { if (String(JSON.parse(info).application.language).startsWith("ja")) L = T.ja; } catch (e) {}
+    render();
+    ws = new WebSocket("ws://127.0.0.1:" + port);
+    ws.onopen = () => {
+      ws.send(JSON.stringify({ event: registerEvent, uuid }));
+      send({ event: "list" });
+    };
+    ws.onmessage = (e) => {
+      const m = JSON.parse(e.data);
+      if (m.event === "didReceiveSettings") { settings = m.payload.settings || {}; render(); }
+      if (m.event === "sendToPropertyInspector") {
+        const p = m.payload || {};
+        if (p.settings) { settings = p.settings; render(); }
+        if (p.monitors) document.getElementById("current").textContent = describe(p.monitors);
+      }
+    };
+  }
+</script>
+</body>
+</html>
