@@ -40,8 +40,10 @@
 
 ### 手順1：プラグインをダウンロードする
 
-1. このページの右側にある **「Releases」** をクリックします。
-2. 一番上にある `com.monitorswitch.streamDeckPlugin` というファイルをクリックしてダウンロードします。
+👉 **[ここをクリックしてダウンロード](https://github.com/nobuCreator/streamdeck-monitor-switch/raw/main/download/com.monitorswitch.streamDeckPlugin)**
+
+クリックすると `com.monitorswitch.streamDeckPlugin` というファイルがダウンロードされます。
+（ダウンロードしたファイルは、ふつうは「ダウンロード」フォルダに入っています）
 
 ### 手順2：Stream Deck に入れる
 
@@ -161,6 +163,7 @@ npm run pack    # dist/com.monitorswitch.streamDeckPlugin を生成
 | `com.monitorswitch.sdPlugin/ui/index.html` | Stream Deck アプリの設定欄 |
 | `com.monitorswitch.sdPlugin/manifest.json` | プラグインの定義 |
 | `tools/ScenarioTest.ps1` | すべての切り替えの組み合わせを自動で確認するテスト |
+| `download/` | 配布用のインストールファイル（`npm run pack` で作った `dist/` のファイルをコピー） |
 
 ### Display.ps1 を単体で使う
 
@@ -214,7 +217,7 @@ No programming knowledge needed.
 
 ### How to set it up
 
-1. Open **Releases** on this page and download `com.monitorswitch.streamDeckPlugin`.
+1. **[Download the plugin here](https://github.com/nobuCreator/streamdeck-monitor-switch/raw/main/download/com.monitorswitch.streamDeckPlugin)** (`com.monitorswitch.streamDeckPlugin`).
 2. Double-click the file and choose **Install** in Stream Deck.
 3. In the Stream Deck app, drag **Monitor Switch → Monitor Layout** onto a key.
 4. In Windows **Settings → System → Display**, set up your monitors the way you want (turn unused ones off with "Disconnect this display", drag them into place, and tick "Make this my main display").
